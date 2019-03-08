@@ -1,0 +1,74 @@
+ALTER TABLE `comuna`.`acessos` 
+CHANGE COLUMN `no_acesso` `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ;
+
+
+ALTER TABLE `comuna`.`cadastros` 
+CHANGE COLUMN `no_cadastro` `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
+CHANGE COLUMN `email` `email` VARCHAR(100) NULL DEFAULT NULL ,
+CHANGE COLUMN `nome` `nome` VARCHAR(100) NULL DEFAULT NULL ;
+
+
+ALTER TABLE `comuna`.`sensores_agua` 
+CHANGE COLUMN `no_evento` `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ;
+
+ALTER TABLE `comuna`.`sensores_luz` 
+CHANGE COLUMN `no_evento` `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ;
+
+ALTER TABLE `comuna`.`cadastros` 
+CHANGE COLUMN `cep` `cep` CHAR(5) NULL DEFAULT NULL ;
+
+
+ALTER TABLE `comuna`.`sensores_agua` 
+CHANGE COLUMN `localizacao` `cep` CHAR(5) NULL DEFAULT NULL ;
+
+ALTER TABLE `comuna`.`sensores_luz` 
+CHANGE COLUMN `localizacao` `cep` CHAR(5) NULL DEFAULT NULL ;
+
+ALTER TABLE `comuna`.`relatorios` 
+CHANGE COLUMN `sensor` `sensor` INT UNSIGNED NULL DEFAULT NULL ;
+
+
+alter table relatorios add column 
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+alter table relatorios add column 
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+
+ALTER SCHEMA `comuna`  DEFAULT CHARACTER SET utf8  DEFAULT COLLATE utf8_general_ci ;
+
+alter table sensores_agua add column 
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+alter table sensores_agua add column 
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+alter table sensores_luz add column 
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+alter table sensores_luz add column 
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+
+ALTER TABLE `comuna`.`relatorios` 
+ADD COLUMN `sensores_id` INT UNSIGNED NOT NULL AFTER `updated_at`;
+
+
+ALTER TABLE `comuna`.`triagem` 
+ADD COLUMN `sensores_id` INT UNSIGNED NOT NULL AFTER `updated_at`;
+
+
+ALTER TABLE `comuna`.`sensores_agua` 
+CHANGE COLUMN `status` `status` VARCHAR(5) NULL DEFAULT 0 ;
+
+ALTER TABLE `comuna`.`sensores_luz` 
+CHANGE COLUMN `status` `status` VARCHAR(5) NULL DEFAULT 0 ;
+
+ALTER TABLE `comuna`.`triagem` 
+CHANGE COLUMN `status` `status` VARCHAR(5) NULL DEFAULT 0 ;
+
+
+ALTER TABLE `comuna`.`relatorios` 
+CHANGE COLUMN `status` `status` VARCHAR(5) NULL DEFAULT 0 ,
+CHANGE COLUMN `sensores_id` `triagem_id` INT(10) UNSIGNED NOT NULL ;
+
