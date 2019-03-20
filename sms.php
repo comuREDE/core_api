@@ -2,34 +2,34 @@
 
 require("init.php");
 
-echo "<pre>";
+#echo "<pre>";
 
 principal();
 
 function principal(){
 	echo "<h1>inicio - ".date('d/m/Y H:i:s')."</h1>";
 	filtroPrimarioAgua();
-	filtroPrimarioLuz();
-	sleep(120);
+	#filtroPrimarioLuz();
+	#sleep(120);
 	echo "<h1>passou pelo primario - ".date('d/m/Y H:i:s')."</h1>";
 
 	filtroSecundario('A');
-	filtroSecundario('E');
-	sleep(60);
+	#filtroSecundario('E');
+	#sleep(60);
 	echo "<h1>passou pelo secundario - ".date('d/m/Y H:i:s')."</h1>";
 
-	alertaSMS('A');
-	alertaSMS('E');
-	echo "<h1>recebeu os sms - ".date('d/m/Y H:i:s')."</h1>";
-	sleep(30);
-	echo "<h1>fim - ".date('d/m/Y H:i:s')."</h1>";
+	#alertaSMS('A');
+	#alertaSMS('E');
+	#echo "<h1>recebeu os sms - ".date('d/m/Y H:i:s')."</h1>";
+	#sleep(30);
+	#echo "<h1>fim - ".date('d/m/Y H:i:s')."</h1>";
 
 }
 
 
 function filtroPrimarioAgua(){
 
-	$sql="SELECT id, dia_hora,
+	$q="SELECT id, dia_hora,
 	DATE_FORMAT(dia_hora,'%Y/%m/%d %H:%i:%s') as data_hora,
 
 	status,created_at, updated_at,
@@ -37,8 +37,14 @@ function filtroPrimarioAgua(){
 
 	FROM sensores_agua 
 	WHERE (status='' OR status IS NULL OR status <> 'T') 
+	AND (id> 40000)
 	ORDER BY dia_hora ASC;";
-	$res = (new BD())->query($sql);
+	
+	#echo $q;die;
+
+	$res = (new BD())->query($q);
+
+	#print_r($res);die;
 
 	$loop=false;
 	$regs=[];
@@ -51,6 +57,21 @@ function filtroPrimarioAgua(){
 			$loop=false;
 		}
 		$cond1 = ($atual==='L' && $proximo==='L' && $proximo_prox==='L');
+		
+/*        
+		$atual_cep=$res[$i]['cep'];
+        $proximo_cep=$res[$i+1]['cep'];
+        $proximo_prox_cep=$res[$i+2]['cep'];
+
+        $atual_sensor=$res[$i]['sensor'];
+        $proximo_sensor=$res[$i+1]['sensor'];
+        $proximo_prox_sensor=$res[$i+2]['sensor'];
+
+        $cond2 = ($atual_cep == $proximo_cep) && ($atual_cep == $proximo_prox_cep);
+        $cond3 = ($atual_sensor == $proximo_sensor) && ($atual_sensor == $proximo_prox_sensor);
+*/
+
+		#if($cond1 && $cond2 && $cond3){
 		if($cond1){
 			if(!$loop){
 				$regs[]=$res[$i];
@@ -61,7 +82,7 @@ function filtroPrimarioAgua(){
 		$post=['id'=>$res[$i]['id'] , 'status'=>'T'];
 		(new Model())->setTable('sensores_agua')->upd($post);
 	}
-	#print_r($regs);
+	#print_r($regs);die;
 
 	saveTriagem($regs,'A');
 	echo "<h1>Triagem Agua ". date('d/m/Y H:m:i')."</h1>";
