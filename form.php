@@ -1,6 +1,6 @@
-<?
+<?php 
 
-#require '_header.php';
+require 'init.php';
 
 $name = $_POST['nome'];
 $email = $_POST['email'];
@@ -12,8 +12,3 @@ $cadastro = $_POST;
 $id = $cadastro->save();
 
 echo "cadastro incluido $id";
-
-
-
-
-#require '_footer.php';
