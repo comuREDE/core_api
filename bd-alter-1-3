@@ -1,0 +1,34 @@
+ALTER SCHEMA `prototipo_funcional`  DEFAULT CHARACTER SET utf8  DEFAULT COLLATE utf8_general_ci ;
+
+
+
+CREATE TABLE `relatorios` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `data_hora` datetime DEFAULT NULL,
+  `cep` char(5) DEFAULT NULL,
+  `sensor` int(10) unsigned DEFAULT NULL,
+  `tipo` char(1) DEFAULT NULL,
+  `status` varchar(5) DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `triagem_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `relatorios_uk` (`data_hora`,`cep`,`sensor`,`tipo`)
+);
+
+triagem, CREATE TABLE `triagem` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `data_hora` datetime DEFAULT NULL,
+  `cep` char(5) DEFAULT NULL,
+  `sensor` int(10) unsigned DEFAULT NULL,
+  `tipo` char(1) DEFAULT NULL,
+  `status` varchar(5) DEFAULT '0',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `sensores_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `triagem_uk` (`data_hora`,`cep`,`sensor`,`tipo`)
+);
+
+
+

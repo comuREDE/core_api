@@ -28,20 +28,17 @@ function principal(){
 
 
 function filtroPrimarioAgua(){
+	echo "<h3>".__FUNCTION__."</h3>";
 
 	$q="SELECT id, dia_hora,
 	DATE_FORMAT(dia_hora,'%Y/%m/%d %H:%i:%s') as data_hora,
-
 	status,created_at, updated_at,
 	estado,cep,sensor, day(dia_hora) as dia
-
 	FROM sensores_agua 
 	WHERE (status='' OR status IS NULL OR status <> 'T') 
-	AND (id> 40000)
 	ORDER BY dia_hora ASC;";
-	
-	#echo $q;die;
 
+	#echo $q;die;
 	$res = (new BD())->query($q);
 
 	#print_r($res);die;
@@ -80,7 +77,8 @@ function filtroPrimarioAgua(){
 		}
 		#passou no registro
 		$post=['id'=>$res[$i]['id'] , 'status'=>'T'];
-		(new Model())->setTable('sensores_agua')->upd($post);
+		$res = (new Model())->setTable('sensores_agua')->upd($post);
+		var_dump($res);
 	}
 	#print_r($regs);die;
 
@@ -91,6 +89,7 @@ function filtroPrimarioAgua(){
 
 
 function filtroPrimarioLuz(){
+	echo "<h3>".__FUNCTION__."</h3>";
 
 	$sql="SELECT id, dia_hora,
 	DATE_FORMAT(dia_hora,'%Y/%m/%d %H:%i:%s') as data_hora,
@@ -122,7 +121,8 @@ function filtroPrimarioLuz(){
 		}
 		#passou no registro
 		$post=['id'=>$res[$i]['id'] , 'status'=>'T'];
-		(new Model())->setTable('sensores_luz')->upd($post);
+		$res = (new Model())->setTable('sensores_luz')->upd($post);
+		var_dump($res);
 	}
 	#print_r($regs);
 
@@ -131,14 +131,15 @@ function filtroPrimarioLuz(){
 }
 
 function saveTriagem(array $regs,string $tipo){
+	echo "<h3>".__FUNCTION__."</h3>";
 	$total = count($regs);
 	foreach ($regs as $k => $reg) {
 		extract($reg);
 		$sensores_id = $id;
-		#$tipo = 'A';
 		$info = compact('sensores_id','data_hora','cep','sensor','tipo');
 				
 		$res = (new Model())->setTable('triagem')->save($info);
+		var_dump($res);
 	}
 	echo "<h3>$total registros ($tipo) upds em triagem</h3>";
 }
@@ -146,17 +147,15 @@ function saveTriagem(array $regs,string $tipo){
 
 
 function filtroSecundario(string $tipo){
+	echo "<h3>".__FUNCTION__."</h3>";
 
 	$sql="SELECT id, 
 	DATE_FORMAT(data_hora,'%Y/%m/%d %H:%i:%s') as data_hora,
 	DATE_FORMAT(data_hora,'%d/%m/%Y') as diames,
-
 	status,sensores_id,
 	cep,sensor
-
 	FROM triagem 
 	WHERE (status='' OR status IS NULL OR status <> 'R') 
-
 	AND tipo='$tipo'
 	ORDER BY data_hora ASC;";
 	$res = (new BD())->query($sql);
@@ -178,28 +177,27 @@ function filtroSecundario(string $tipo){
 }
 
 function saveRelatorios(array $relats, string $tipo){
+	echo "<h3>".__FUNCTION__."</h3>";
 	$total = count($relats);
 	foreach ($relats as $k => $relat) {
 		extract($relat);
 		$triagem_id = $id;
-		#$tipo = 'A';
 		$info = compact('triagem_id','data_hora','cep','sensor','tipo');
 				
 		$res = (new Model())->setTable('relatorios')->save($info);
+		var_dump($res);
 	}
 	echo "<h3>$total registros upds em relatorios</h3>";
 }
 
 
 function alertaSMS($tipo){
-
+	echo "<h3>".__FUNCTION__."</h3>";
 	$sql="SELECT id, 
 	DATE_FORMAT(data_hora,'%Y/%m/%d %H:%i:%s') as data_hora,
-	#DATE_FORMAT(data_hora,'%H') as hora,
 	cep
 	FROM relatorios 
 	WHERE (status='' OR status IS NULL OR status <> 'SMS') 
-
 	ORDER BY data_hora ASC;";
 	$res = (new BD())->query($sql);
 
@@ -236,7 +234,8 @@ function alertaSMS($tipo){
 
 	for($j=0; $j<$count; $j++){
 		$post=['id'=>$res[$j]['id'] , 'status'=>'SMS'];
-		(new Model())->setTable('relatorios')->upd($post);
+		$res = (new Model())->setTable('relatorios')->upd($post);
+		var_dump($res);
 	}
 	echo "<h1>SMS - $total tentativas SMS ". date('d/m/Y H:m:i')."</h1>";
 }
@@ -279,138 +278,3 @@ function enviaSMS($ddd,$celular,$msg,$tipo='rapido'){
 
 
 
-
-
-
-
-
-
-
-
-
-
-##########################################################
-##########################################################
-
-/*
-
-function montaJSONsemanal($data1,$data2,$cep,$tipo){
-
-	$sql="SELECT id, data_hora, 
-	DATE_FORMAT(data_hora,'%Y/%m/%d %H:%i:%s') as `data`,
-	status,
-	day(data_hora) as dia,
-	month(data_hora) as mes,
-	year(data_hora) as ano
-	
-	FROM relatorios 
-	WHERE (data_hora BETWEEN '$data1' AND '$data2') 
-	AND cep='$cep'
-	AND tipo='$tipo'
-	ORDER BY data_hora ASC;";
-	$res = (new BD())->query($sql);
-
-	$dias = array_column($res, 'dia');
-	print_r($dias);
-
-
-}
-
-
-	function preencheDiasFiltroPrimario(){
-		$regs = filtroPrimario();
-		$plots=[];
-		$relats=[];
-		$j=1;
-		$count=count($regs);
-		for($i=0; $i<$count; $i++){
-			extract($regs[$i]); #id dia_hora estado localizacao sensor
-			#echo $j,':',$id,'-',$dia_hora,'-<b>','|',$dia,'|',$estado,'</b>-',$cep,'-',$sensor,'-',$data_hora,'<br>';
-			if(!array_key_exists($dia, $plots)){
-				$plots[$dia]=$regs[$i]['dia_hora'];
-				$relats[$dia]=$regs[$i];
-			}
-			$j++;
-		}
-		
-		foreach ($relats as $key => $chart) {
-			
-			if(is_array($chart)){
-				extract($chart);
-				#$dia_hora = $data_hora;
-				#$cep = $cep;
-				$tipo='A';
-				salvaRelatorio($data_hora, $cep, $sensor, $tipo);
-			} else {
-				echo "Dia $key sem dados<br>";
-			}
-		}
-		
-		return $relats;		
-	}
-	
-
-
-	function binarizaPreencheDiasFiltroPrimario(){
-		$relats = preencheDiasFiltroPrimario();
-		$charts=[];
-		for($z=2;$z<31;$z++){
-			$charts[$z]=array_key_exists($z, $plots)?$relats[$z]:null;
-		}
-
-	}
-
-
-	function getCepsBetweenDatas($data1, $data2){
-		$data1="2018/09/03";
-		$data2="2018/09/23";
-		$sql="SELECT DISTINCT cep FROM relatorios WHERE data_hora BETWEEN '$data1' AND '$data2';";
-		$res = (new BD())->query($sql);	
-		$ceps = array_column($res, 'cep');
-		return $ceps;
-	}
-
-	function getUsuariosCepsBetweenDatas($data1, $data2){
-		$ceps = getCepsBetweenDatas($data1, $data2);
-
-		$ceps = implode(',',$ceps);
-
-		$sql="SELECT DISTINCT * FROM cadastros WHERE cep IN ('$ceps');";
-		$cadastros = (new BD())->query($sql);	
-		return $cadastros;
-	}
-
-	function processaListaParaEnvioSMS(){
-		#print_r($cadastros);die;
-		$cadastros = getUsuariosCepsBetweenDatas($data1, $data2);
-		foreach ($cadastros as $cadastro) {
-			extract($cadastro);
-			$msg="caiu agua";
-			$ddd = substr($celular, 0,2);
-			$celular = substr($celular, 3,9);
-			$assunto = "assunto caiu agua";
-
-			$header = "header caiua a<br>";
-			$texto = "vai la ver agora q caiu aguaaa";
-			$footer = "footer caiu a<br>";
-			$msg = $header . $texto . $footer;
-			#echo $msg;die;
-
-			#enviaSMS($ddd,$celular,$msg);                                                                      
-		}
-	
-	}
-
-
-
-function salvaRelatorio(string $data_hora, string $cep, int $sensor, string $tipo){
-
-	$info = compact('data_hora','cep','sensor','tipo');
-			
-	$res = (new Model())->setTable('relatorios')->save($info);
-
-	var_dump($res);
-
-}
-
-*/
