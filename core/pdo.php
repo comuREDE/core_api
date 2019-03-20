@@ -55,7 +55,12 @@ class BD {
 	function query(string $sql, array $campos=[],string $order=null,int $pagina=null) { 
 	    $pdo = self::getCN();
 
+	    #echo $sql;
+
 		$tipo = strtolower(substr($sql, 0, 6));
+		
+		#echo $tipo;
+
 		if($order){
 			$sql .= " ORDER BY ". $order;
 		}
@@ -87,6 +92,7 @@ class BD {
        		return $stmt->errorInfo()[2]; # a chave 2 e que contem a descricao do erro
         
         } else {
+        	#echo $tipo;
 			switch ($tipo) {
 				case 'select':
 		            #if($stmt->columnCount() == 1){

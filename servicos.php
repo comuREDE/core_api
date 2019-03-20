@@ -4,13 +4,13 @@ require 'init.php';
 #pegar o param cep
 
 #$cep = $_GET['cep'];
+$cep="24130400";
 
 $param = $_GET['param'];
 switch ($param) {
 	case 'estado_agua_agora':
-		$cep="24130400";
-		$d1="2019/03/15";
-		#$d1=date('Y/m/d');
+		#$d1="2019/03/15";
+		$d1=date('Y/m/d');
 		$data = new DateTime($d1);
 		$dia = $data->format('d');
 		$mes = $data->format('m');
@@ -39,8 +39,6 @@ switch ($param) {
 					$sensores[$sensor]=$estado;
 				}
 			}
-			#extract($res[0]);
-			#var_dump($sensores);die;
 			foreach ($sensores as $sensor) {
 				if($sensor == "L"){
 					$status = "L";
@@ -53,8 +51,8 @@ switch ($param) {
 	break;
 	
 	case 'estado_agua_grafico':
-		$d1="2019/03/15";
-		#$d1=date('Y/m/d');
+		#$d1="2019/03/15";
+		$d1=date('Y/m/d');
 
 		$data1 = new DateTime($d1);
 		$data_str_1 = $data1->format('Y/d/m');
@@ -62,7 +60,6 @@ switch ($param) {
 		$data2 = $data1->modify('-7 day');
 		$data_str_2 = $data2->format('Y/d/m');
 
-		$cep="24130";
 		$tipo='A';
 		$res = montaJSONsemanal($data_str_1,$data_str_2,$cep,$tipo);
 		echo json_encode($res,true);
@@ -70,26 +67,62 @@ switch ($param) {
 
 
 	case 'estado_luz_agora':
-		$sql="SELECT * FROM sensores_luz ORDER BY dia_hora DESC LIMIT 1;";
-		$res = (new BD())->query($sql);
-		extract($res[0]);
-		echo json_encode($estado,true);
+		#$d1="2019/03/15";
+		$d1=date('Y/m/d');
+		$data = new DateTime($d1);
+		$dia = $data->format('d');
+		$mes = $data->format('m');
+		$ano = $data->format('Y');
+
+		$q="SELECT DISTINCT 
+		estado,cep,sensor,
+		concat(day(dia_hora),'/',month(dia_hora),'/',year(dia_hora))
+		FROM sensores_luz WHERE 
+		cep='$cep' 
+		AND day(dia_hora)='$dia' 
+		AND month(dia_hora)='$mes' 
+		AND year(dia_hora)='$ano'
+		ORDER BY sensor,dia_hora DESC
+		;";
+		#ORDER BY dia_hora DESC LIMIT 1
+		#echo $q;die;
+		$res = (new BD())->query($q);
+		#var_dump($res);die;
+		if(is_array($res)){
+			$status = "D";
+			$sensores=[];
+			foreach ($res as $reg) {
+				extract($reg);# sensor estado
+				if(!isset($sensores[$sensor])){
+					$sensores[$sensor]=$estado;
+				}
+			}
+			foreach ($sensores as $sensor) {
+				if($sensor == "L"){
+					$status = "L";
+				}
+			}
+			echo json_encode($status,true);
+		} else {
+			echo json_encode('Erro',true);
+		}
+
 	break;
 	
 	case 'estado_luz_grafico':
-		$d1="2018/09/10";
-		#$d1=date('Y/m/d');
+		#$d1="2019/03/15";
+		$d1=date('Y/m/d');
 
 		$data1 = new DateTime($d1);
-		$data_str_1 = $data1->format('Y/m/d');
+		$data_str_1 = $data1->format('Y/d/m');
 		
 		$data2 = $data1->modify('-7 day');
-		$data_str_2 = $data2->format('Y/m/d');
+		$data_str_2 = $data2->format('Y/d/m');
 
-		$cep="24130";
 		$tipo='E';
 		$res = montaJSONsemanal($data_str_1,$data_str_2,$cep,$tipo);
 		echo json_encode($res,true);
+
 	break;	
 
 	default:
@@ -114,16 +147,11 @@ function montaJSONsemanal($data1,$data2,$cep,$tipo){
 
 	$res = (new BD())->query($q);
 
-	#print_r($res);
-	#$data1_formatado_php = preg_replace('#(\d{4})/(\d{1,2})/(\d{1,2})#', '$3/$2/$1', $data1);
-	#$data2_formatado_php = preg_replace('#(\d{4})/(\d{1,2})/(\d{1,2})#', '$3/$2/$1', $data2);
-
 	$datas = array_column($res, 'data');
 	#print_r($datas);
 
 	$d1 = DateTime::createFromFormat('Y/d/m', $data1);
 	$d2 = DateTime::createFromFormat('Y/d/m', $data2);
-	#$d2 = DateTime($data2);
 
 	$diff = $d2->diff($d1)->format("%a");	
 	$dias_sem = ['D','S','T','Q','Q','S','S',];
