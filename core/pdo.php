@@ -67,7 +67,7 @@ class BD {
 		    $sql .= sprintf(" LIMIT %d OFFSET %d",$limit,$offset);
 		}
  		
-		#echo $sql;
+		#echo $sql,'<br>';
 
         $stmt = $pdo->prepare($sql);
         if(count($campos)>0){
@@ -80,7 +80,7 @@ class BD {
         }
 
         #echo $sql;
-        #echo "<pre>";print_r($campos);
+        #echo print_r($campos);
         #echo "<hr>";
 
         if(!$stmt->execute()){
