@@ -8,16 +8,16 @@ ini_set('display_errors',TRUE);
 require "core/pdo.php";
 
 if($_POST){
-	$name = $_POST['nome'];
+	$name = $_POST['name'];
 	$email = $_POST['email'];
 	$celular = $_POST['celular'];
 	$cep = $_POST['cep'];
 
 
 	$cadastro = $_POST; 
-	$id = $cadastro->save();
+	$res = (new Model())->setTable('cadastros')->save($cadastro);
 
-	echo "cadastro incluido $id";
+	var_dump($res);
 	
 } else {
 	echo "form nao recebido";
