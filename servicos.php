@@ -60,6 +60,7 @@ switch ($param) {
 		$data2 = $data1->modify('-7 day');
 		$data_str_2 = $data2->format('Y/d/m');
 
+		
 		$tipo='A';
 		$res = montaJSONsemanal($data_str_1,$data_str_2,$cep,$tipo);
 		echo json_encode($res,true);
@@ -158,7 +159,7 @@ function montaJSONsemanal($data1,$data2,$cep,$tipo){
 
 	#echo $diff;
 	$json=[];
-	$data = DateTime::createFromFormat('Y/d/m', $data1);
+	$data = DateTime::createFromFormat('Y/d/m', $data2);
 
 	#echo '<hr>',$data1,'<hr>',$data2,'<hr>';
 	
