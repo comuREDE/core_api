@@ -3,7 +3,8 @@
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- <meta http-equiv="refresh" content="3"> -->
 	<link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.4.1/css/all.css' integrity='sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz' crossorigin='anonymous'>
 	<link href="fonts/fonts.css" rel="stylesheet">
 	<link rel="stylesheet" href="style.css">
@@ -15,15 +16,15 @@
 	<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 	<script>
 		const endpoint = 'servicos.php?param=estado_luz_grafico';
-		const infoData = [];
-	
+		const infoDataLuz = [];
+
 		axios
 			.get(endpoint)
 			.then((response) => {
 				let data = response.data;
 
 				data.forEach((info) => {
-					infoData.push(info)
+					infoDataLuz.push(info)
 				})				
 			})
 			.catch((error) => {
@@ -38,9 +39,10 @@
 		function drawChart() {
 			var data = google.visualization.arrayToDataTable([
 				['Luz', 'Caindo'],
-				[1, infoData[0].caiu], [2, infoData[1].caiu], [3, infoData[2].caiu],
-				[4, infoData[3].caiu], [5, infoData[4].caiu], [6, infoData[5].caiu], 
-				[7, infoData[6].caiu], [8, infoData[7].caiu]
+				[validation(infoDataLuz[0].dia), infoDataLuz[0].caiu], [validation(infoDataLuz[1].dia), infoDataLuz[1].caiu], 
+				[validation(infoDataLuz[2].dia), infoDataLuz[2].caiu], [validation(infoDataLuz[3].dia), infoDataLuz[3].caiu], 
+				[validation(infoDataLuz[4].dia), infoDataLuz[4].caiu], [validation(infoDataLuz[5].dia), infoDataLuz[5].caiu], 
+				[validation(infoDataLuz[6].dia), infoDataLuz[6].caiu], [validation(infoDataLuz[7].dia), infoDataLuz[7].caiu]
 			]);
 
 			var options = {
@@ -92,6 +94,7 @@
 			.get(graficoAgua)
 			.then((response) => {
 				let data = response.data;
+
 				console.log('data: ', data)
 
 				data.forEach((info) => {
@@ -107,12 +110,17 @@
 		});
 		google.charts.setOnLoadCallback(drawChart);
 
+		const validation = (value) => {
+			return value.substring(2,10)
+		}
+
 		function drawChart() {
 			var data = google.visualization.arrayToDataTable([
 				['Água', 'Caindo'],
-				[1, infoDataAgua[0].caiu], [2, infoDataAgua[1].caiu], [3, infoDataAgua[2].caiu],
-				[4, infoDataAgua[3].caiu], [5, infoDataAgua[4].caiu], [6, infoDataAgua[5].caiu], 
-				[7, infoDataAgua[6].caiu], [8, infoDataAgua[7].caiu]
+				[validation(infoDataAgua[0].dia), infoDataAgua[0].caiu], [validation(infoDataAgua[1].dia), infoDataAgua[1].caiu], 
+				[validation(infoDataAgua[2].dia), infoDataAgua[2].caiu], [validation(infoDataAgua[3].dia), infoDataAgua[3].caiu], 
+				[validation(infoDataAgua[4].dia), infoDataAgua[4].caiu], [validation(infoDataAgua[5].dia), infoDataAgua[5].caiu], 
+				[validation(infoDataAgua[6].dia), infoDataAgua[6].caiu], [validation(infoDataAgua[7].dia), infoDataAgua[7].caiu]
 			]);
 
 			var options = {
@@ -155,7 +163,7 @@
 			var chart = new google.visualization.AreaChart(document.getElementById('chart_div--water'));
 			chart.draw(data, options);
 		}
-	</script>
+  </script>
 </head>
 
 <body class="bodyServices">
@@ -165,16 +173,37 @@
 	<main class="container container--services">
 		<section class="container__section">
 			<h2 class="container__title container__title--service">Ta caindo água?</h2>
-			<img class="container__imgIndicator" src="images/Icone-torneira.svg" alt="Torneira">
-			<div id="chart_div--water"></div>
+			<img class="container__imgIndicator" id="torneiraAgua" alt="Torneira">
+      <div id="chart_div--water"></div>
 			<!-- <img class="container__graficoTemporário" src="images/modeloGrafico.png" alt="Gráfico"> -->
 		</section>
 		<section class="container__section">
-			<img class="container__imgIndicator" src="images/Icone-Lampada.svg" alt="Lampada">
+			<img class="container__imgIndicator" id='lampadaLuz' alt="Lampada">
 			<h2 class="container__title container__title--service container__title--right">Ta com luz?</h2>
 			<div id="chart_div--ligth"></div>
 			<!-- <img class="container__graficoTemporário " src="images/modeloGrafico.png " alt="Gráfico "> -->
-		</section>
+    </section>
+    <form class="container__formRegister container__formSubscribe" method="POST" action="md.php">
+        <input type="hidden" name="cep" value="24130400">
+        <h2 class="formRegister__title">Cadastre-se e  receba notificações e relatórios automaticamente</h2>
+        <label class="formRegister__item" for="data1">
+            Data Inicial
+            <input class="formRegister__itemInput" type="date" name="data1">
+        </label>
+        <label class="formRegister__item" for="data2">
+            Data Final
+            <input class="formRegister__itemInput" type="date" name="data2">
+        </label>
+        <input type="radio" id="tipo" name="tipo" value="A">
+        <label for="tipo">Água</label>
+        <input type="radio" id="tipo" name="tipo" value="E">
+        <label for="tipo">Luz</label>  
+        <label class="formRegister__item" for="email">
+            E-mail
+            <input class="formRegister__itemInput" type="email" name="email">
+        </label>
+        <button class="formRegister__itemButton btn__default">Enviar</button>
+    </form>
 	</main>
 	<footer class="footer footer--service ">
 		<a class="footer__linkHome " href="index.html ">
@@ -182,8 +211,50 @@
 		</a>
 	</footer>
 	<script>
-		
-	</script>
+      let aguaAgora = null,
+        luzAgora = null
+      const torneira = document.getElementById('torneiraAgua'),
+        lampada = document.getElementById('lampadaLuz')
+  
+      axios
+        .get('./servicos.php?param=estado_agua_agora')
+        .then((response) => {
+          console.log('response Agua', response.data);
+          aguaAgora = response.data
+
+          if(aguaAgora === "L") {
+            torneira.src='./images/Icone-torneira.svg'
+          } else if(aguaAgora === "D") {
+            torneira.src='./images/Icone-torneira-2.svg'
+          } else {
+            console.log('Deu erro!');
+          }
+        })
+        .catch((error) => {
+          console.log('error: ', error);
+        });
+
+      axios
+        .get('./servicos.php?param=estado_luz_agora')
+        .then((response) => {
+          console.log('response Luz', response.data);
+          luzAgora = response.data
+
+          if(luzAgora === "L") {
+            lampada.src='./images/Icone-Lampada.svg'
+          } else if(luzAgora === "D") {
+            lampada.src='./images/Icone-Lampada-2.svg'
+            lampada.style.width='35%'
+          } else {
+            console.log('Deu erro!');
+          }
+        })
+        .catch((error) => {
+          console.log('error: ', error);
+        });
+    
+        
+    </script>
 </body>
 
 </html>

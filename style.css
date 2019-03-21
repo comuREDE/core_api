@@ -204,7 +204,8 @@ button:focus{
 .container--services{
   min-height: 50vh;
   display: flex;
-  flex-flow: row nowrap;
+  flex-direction: row;
+  flex-direction: wrap;
   justify-content: space-around;
   align-items: stretch;
 }
